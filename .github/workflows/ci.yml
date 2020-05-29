@@ -29,8 +29,8 @@ jobs:
           command: build
       - uses: actions/upload-artifact@v1
         with:
-          name: boardgame-linux
-          path: target/debug/boardgame
+          name: tic-tac-toe-linux
+          path: target/debug/tic-tac-toe-rust
 
   test-windows:
     runs-on: windows-latest
@@ -57,5 +57,5 @@ jobs:
           command: build
       - uses: actions/upload-artifact@v1
         with:
-          name: boardgame-windows
-          path: target/debug/boardgame.exe
+          name: tic-tac-toe-windows
+          path: target/debug/tic-tac-toe-rust.exe
