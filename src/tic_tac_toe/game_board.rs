@@ -49,18 +49,18 @@ impl GameBoard {
         }
 
         for i in 0..self.board_size {
-            let player_in_column = self.board[i][0].get_player();
-            let player_in_row = self.board[0][i].get_player();
+            let player_in_column = self.board[0][i].get_player();
+            let player_in_row = self.board[i][0].get_player();
 
             let mut condition_satisfied_for_column = true;
             let mut condition_satisfied_for_row = true;
 
             for j in 1..self.board_size {
-                if self.board[i][j].get_player().ne(player_in_column) {
+                if self.board[j][i].get_player().ne(player_in_column) {
                     condition_satisfied_for_column = false
                 }
 
-                if self.board[j][i].get_player().ne(player_in_row) {
+                if self.board[i][j].get_player().ne(player_in_row) {
                     condition_satisfied_for_row = false
                 }
             }
@@ -92,13 +92,12 @@ impl GameBoard {
     pub fn mark_cell(&mut self, column: usize, row: usize) -> Option<()> {
         if row < self.board_size
             && column < self.board_size
-            && !self.board[column][row].is_occupied()
+            && !self.board[row][column].is_occupied()
         {
-            self.board[column][row].set_player(&self.current_player);
+            self.board[row][column].set_player(&self.current_player);
             self.progress_player();
             Some(())
         } else {
-            println!("Invalid turn!");
             None
         }
     }
@@ -139,12 +138,98 @@ impl GameBoard {
 
 #[cfg(test)]
 pub mod tests {
-    #[test]
-    fn test_new() {}
+    use crate::tic_tac_toe::game_board::GameBoard;
+    use crate::tic_tac_toe::player::Player;
 
     #[test]
-    fn test_mark_cell() {}
+    fn test_mark_cell() {
+        let mut game_board = GameBoard::new(2);
+        assert_eq!(game_board.board[0][0].is_occupied(), false);
+        assert_eq!(game_board.current_player, Player::Cross);
+
+        assert_eq!(game_board.mark_cell(0, 0), Some(()));
+        assert_eq!(game_board.board[0][0].is_occupied(), true);
+        assert_eq!(*game_board.board[0][0].get_player(), Player::Cross);
+        assert_eq!(game_board.current_player, Player::Nought);
+
+        assert_eq!(game_board.mark_cell(0, 0), None);
+        assert_eq!(game_board.board[0][0].is_occupied(), true);
+        assert_eq!(*game_board.board[0][0].get_player(), Player::Cross);
+        assert_eq!(game_board.current_player, Player::Nought);
+
+        assert_eq!(game_board.mark_cell(2, 0), None);
+        assert_eq!(game_board.mark_cell(0, 2), None);
+
+        assert_eq!(game_board.mark_cell(1, 1), Some(()));
+        assert_eq!(game_board.board[1][1].is_occupied(), true);
+        assert_eq!(*game_board.board[1][1].get_player(), Player::Nought);
+        assert_eq!(game_board.current_player, Player::Cross);
+    }
 
     #[test]
-    fn test_game_over() {}
+    fn test_1() {
+        let mut game_board = GameBoard::new(2);
+        game_board.mark_cell(0, 0);
+        game_board.mark_cell(1, 0);
+        game_board.mark_cell(1, 0);
+        assert_eq!(game_board.game_over(), false);
+
+        game_board.mark_cell(0, 1);
+        assert_eq!(game_board.game_over(), true);
+
+        game_board.mark_cell(1, 1);
+        assert_eq!(game_board.game_over(), true);
+    }
+
+    #[test]
+    fn test_2() {
+        let mut game_board = GameBoard::new(3);
+        game_board.mark_cell(0, 0);
+        game_board.mark_cell(1, 0);
+        game_board.mark_cell(1, 0);
+        game_board.mark_cell(2, 0);
+        assert_eq!(game_board.game_over(), false);
+
+        game_board.mark_cell(1, 1);
+        game_board.mark_cell(1, 2);
+        assert_eq!(game_board.game_over(), false);
+
+        game_board.mark_cell(0, 1);
+        game_board.mark_cell(0, 2);
+        game_board.mark_cell(0, 2);
+        game_board.mark_cell(2, 1);
+        assert_eq!(game_board.game_over(), true);
+    }
+
+    #[test]
+    fn test_3() {
+        let mut game_board = GameBoard::new(3);
+        game_board.mark_cell(0, 0);
+        game_board.mark_cell(0, 0);
+        game_board.mark_cell(1, 0);
+        game_board.mark_cell(1, 1);
+        assert_eq!(game_board.game_over(), false);
+
+        game_board.mark_cell(2, 0);
+        game_board.mark_cell(2, 0);
+        game_board.mark_cell(2, 2);
+        assert_eq!(game_board.game_over(), true);
+    }
+
+    #[test]
+    fn test_4() {
+        let mut game_board = GameBoard::new(4);
+        game_board.mark_cell(0, 3);
+        game_board.mark_cell(0, 0);
+        game_board.mark_cell(1, 2);
+        game_board.mark_cell(2, 2);
+        game_board.mark_cell(2, 2);
+        game_board.mark_cell(2, 1);
+        assert_eq!(game_board.game_over(), false);
+
+        game_board.mark_cell(1, 1);
+        game_board.mark_cell(1, 1);
+        game_board.mark_cell(3, 0);
+        assert_eq!(game_board.game_over(), true);
+    }
 }

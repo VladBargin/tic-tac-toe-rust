@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub enum Player {
     None,
     Cross,
@@ -41,5 +42,27 @@ pub fn player_to_string(player: &Player) -> &str {
         Player::None => " ",
         Player::Cross => "x",
         Player::Nought => "o",
+    }
+}
+
+#[cfg(test)]
+pub mod tests {
+    use crate::tic_tac_toe::player::Player;
+
+    #[test]
+    fn test_eq() {
+        let t10 = Player::None;
+        let t11 = Player::None;
+        let t20 = Player::Cross;
+        let t21 = Player::Cross;
+        let t30 = Player::Nought;
+        let t31 = Player::Nought;
+
+        assert_eq!(t10 == t11, true);
+        assert_eq!(t20 == t21, true);
+        assert_eq!(t30 == t31, true);
+        assert_eq!(t10 == t20, false);
+        assert_eq!(t20 == t30, false);
+        assert_eq!(t30 == t10, false);
     }
 }

@@ -31,9 +31,3 @@ impl GameCell {
         &self.player
     }
 }
-
-#[cfg(test)]
-pub mod tests {
-    #[test]
-    fn test_is_occupied() {}
-}
