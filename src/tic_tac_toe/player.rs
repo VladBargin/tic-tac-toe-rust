@@ -1,4 +1,8 @@
 #[derive(Debug)]
+
+/// # Player
+///
+/// An enum of all possible players that a cell can hold
 pub enum Player {
     None,
     Cross,
@@ -21,6 +25,7 @@ impl PartialEq for Player {
     }
 }
 
+/// Get's the `Player` who has the turn after `player`
 pub fn get_next_player(player: &Player) -> Player {
     match *player {
         Player::None => Player::Cross,
@@ -29,6 +34,7 @@ pub fn get_next_player(player: &Player) -> Player {
     }
 }
 
+/// Get's the `Player` who had the turn before `player`
 pub fn get_previous_player(player: &Player) -> Player {
     match *player {
         Player::None => Player::Nought,
@@ -37,6 +43,7 @@ pub fn get_previous_player(player: &Player) -> Player {
     }
 }
 
+/// Returns the string representation of `player`
 pub fn player_to_string(player: &Player) -> &str {
     match *player {
         Player::None => " ",

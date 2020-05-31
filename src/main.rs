@@ -3,14 +3,17 @@ use std::cmp::max;
 use std::io::{stdout, Write};
 use text_io::try_read;
 
+/// Implements game state for a game of tic-tac-toe
 mod tic_tac_toe;
 
+/// Flushes `stdout`
 fn flush() {
     match stdout().flush() {
         _ => {}
     }
 }
 
+/// Create a `GameBoard` and simulate a game of tic-tac-toe
 fn main() {
     print!("Input board size (default is 3, min is 2): ");
     flush();
@@ -20,7 +23,6 @@ fn main() {
     };
 
     let mut game_board = GameBoard::new(board_size);
-
     game_board.print_board();
     loop {
         game_board.print_current_player_message();

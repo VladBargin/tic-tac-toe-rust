@@ -1,6 +1,10 @@
 use crate::tic_tac_toe::game_cell::GameCell;
 use crate::tic_tac_toe::player::{get_next_player, get_previous_player, Player};
 
+/// # GameBoard
+///
+/// Stores game state.
+/// Allows you to print it and progress it.
 pub struct GameBoard {
     board_size: usize,
     board: Vec<Vec<GameCell>>,
@@ -8,6 +12,7 @@ pub struct GameBoard {
 }
 
 impl GameBoard {
+    /// Create a new game state with a square game board with size `board_size` filled with `Player::None` and current_player set to `Player::Cross`
     pub fn new(board_size: usize) -> Self {
         Self {
             board_size,
@@ -16,6 +21,7 @@ impl GameBoard {
         }
     }
 
+    /// Check if game state is terminal
     pub fn game_over(&self) -> bool {
         let player_in_main_diagonal = self.board[0][0].get_player();
         let player_in_minor_diagonal = self.board[self.board_size - 1][0].get_player();
@@ -81,14 +87,19 @@ impl GameBoard {
         false
     }
 
+    /// Set's `current_player` to player who has the next turn
     fn progress_player(&mut self) {
         self.current_player = get_next_player(&self.current_player)
     }
 
+    /// Set's `current_player` to player who had the previous turn
     fn regress_player(&mut self) {
         self.current_player = get_previous_player(&self.current_player)
     }
 
+    /// Return `Option<()>` and set the cell at `(column, row)` to `current_player` if it is a valid position and is currently unoccupied
+    ///
+    /// Otherwise return `None`
     pub fn mark_cell(&mut self, column: usize, row: usize) -> Option<()> {
         if row < self.board_size
             && column < self.board_size
@@ -118,6 +129,7 @@ impl GameBoard {
         }
     }
 
+    /// Print who's turn it is
     pub fn print_current_player_message(&self) {
         match self.current_player {
             Player::Cross => println!("Turn of crosses!"),
@@ -126,6 +138,7 @@ impl GameBoard {
         }
     }
 
+    /// Print who won the game
     pub fn print_game_over_message(&mut self) {
         self.regress_player();
         match self.current_player {
