@@ -13,7 +13,10 @@ jobs:
           toolchain: stable
       - uses: actions-rs/cargo@v1
         with:
-          command: [test, clippy]
+          command: test
+      - uses: actions-rs/cargo@v1
+        with:
+         command: clippy
 
   build-linux:
     runs-on: ubuntu-latest
@@ -41,7 +44,10 @@ jobs:
           toolchain: stable
       - uses: actions-rs/cargo@v1
         with:
-          command: [test, clippy]
+          command: test
+      - uses: actions-rs/cargo@v1
+        with:
+          command: clippy
 
   build-windows:
     runs-on: windows-latest
