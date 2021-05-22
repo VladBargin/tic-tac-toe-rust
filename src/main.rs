@@ -8,9 +8,7 @@ mod tic_tac_toe;
 
 /// Flushes `stdout`
 fn flush() {
-    match stdout().flush() {
-        _ => {}
-    }
+    let _ = stdout().flush();
 }
 
 /// Create a `GameBoard` and simulate a game of tic-tac-toe
@@ -24,34 +22,24 @@ fn main() {
 
     let mut game_board = GameBoard::new(board_size);
     game_board.print_board();
-    loop {
+    while !game_board.game_over() {
+        println!();
         game_board.print_current_player_message();
 
         print!("Input column (x): ");
         flush();
-        let column: usize = match try_read!() {
-            Ok(t) => t,
-            Err(_e) => board_size,
-        };
+        let column: usize = try_read!().unwrap_or(board_size);
 
         print!("Input row    (y): ");
         flush();
-        let row: usize = match try_read!() {
-            Ok(t) => t,
-            Err(_e) => board_size,
-        };
+        let row: usize = try_read!().unwrap_or(board_size);
 
         match game_board.mark_cell(column, row) {
-            Some(()) => {
-                game_board.print_board();
-                if game_board.game_over() {
-                    game_board.print_game_over_message();
-                    break;
-                };
-            }
-            None => {
-                println!("Invalid turn!");
-            }
+            Some(()) => game_board.print_board(),
+            None => println!("Invalid turn!"),
         }
     }
+
+    println!();
+    game_board.print_game_over_message();
 }
