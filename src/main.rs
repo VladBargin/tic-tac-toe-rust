@@ -1,45 +1,45 @@
 use crate::tic_tac_toe::game_board::GameBoard;
-use std::cmp::max;
-use std::io::{stdout, Write};
 use text_io::try_read;
+
+use std::io::{stdin, stdout, Write};
+use termion::event::{Event, Key, MouseEvent};
+use termion::input::{MouseTerminal, TermRead};
+use termion::raw::IntoRawMode;
 
 /// Implements game state for a game of tic-tac-toe
 mod tic_tac_toe;
 
-/// Flushes `stdout`
-fn flush() {
-    let _ = stdout().flush();
-}
-
 /// Create a `GameBoard` and simulate a game of tic-tac-toe
 fn main() {
     print!("Input board size (default is 3, min is 2): ");
-    flush();
-    let board_size = match try_read!("{}\n") {
-        Ok(t) => max(2, t),
-        Err(_e) => 3,
-    };
+    stdout().flush().unwrap();
+    let board_size = try_read!("{}\n").unwrap_or(3).max(2);
+
+    // Init termion
+    let mut stdout = MouseTerminal::from(stdout().into_raw_mode().unwrap());
 
     let mut game_board = GameBoard::new(board_size);
-    game_board.print_board();
-    while !game_board.game_over() {
-        println!();
-        game_board.print_current_player_message();
+    game_board.print_board(&mut stdout).unwrap();
 
-        print!("Input column (x): ");
-        flush();
-        let column: usize = try_read!().unwrap_or(board_size);
-
-        print!("Input row    (y): ");
-        flush();
-        let row: usize = try_read!().unwrap_or(board_size);
-
-        match game_board.mark_cell(column, row) {
-            Some(()) => game_board.print_board(),
-            None => println!("Invalid turn!"),
+    'game: while !game_board.game_over() {
+        for c in stdin().events() {
+            match c.unwrap() {
+                Event::Key(Key::Char('q')) => return,
+                Event::Mouse(MouseEvent::Press(_, x, y)) if x % 2 == 0 => {
+                    if game_board
+                        .mark_cell((x / 2 - 1) as usize, y as usize - 1)
+                        .is_some()
+                    {
+                        game_board.print_board(&mut stdout).unwrap();
+                        continue 'game;
+                    }
+                }
+                _ => {}
+            }
         }
     }
 
+    drop(stdout);
     println!();
     game_board.print_game_over_message();
 }
