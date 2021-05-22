@@ -1,5 +1,5 @@
-use crate::tic_tac_toe::game_cell::GameCell;
-use crate::tic_tac_toe::player::{get_next_player, get_previous_player, Player};
+use super::game_cell::GameCell;
+use super::player::Player;
 
 /// # GameBoard
 ///
@@ -23,21 +23,18 @@ impl GameBoard {
 
     /// Check if game state is terminal
     pub fn game_over(&self) -> bool {
-        let player_in_main_diagonal = self.board[0][0].get_player();
-        let player_in_minor_diagonal = self.board[self.board_size - 1][0].get_player();
+        let player_in_main_diagonal = self.board[0][0].player;
+        let player_in_minor_diagonal = self.board[self.board_size - 1][0].player;
 
         let mut condition_satisfied_for_main_diagonal = true;
         let mut condition_satisfied_for_minor_diagonal = true;
 
         for i in 1..self.board_size {
-            if *self.board[i][i].get_player() != *player_in_main_diagonal {
+            if self.board[i][i].player != player_in_main_diagonal {
                 condition_satisfied_for_main_diagonal = false;
             }
 
-            if self.board[self.board_size - i - 1][i]
-                .get_player()
-                .ne(player_in_minor_diagonal)
-            {
+            if self.board[self.board_size - i - 1][i].player != player_in_minor_diagonal {
                 condition_satisfied_for_minor_diagonal = false;
             }
         }
@@ -55,18 +52,18 @@ impl GameBoard {
         }
 
         for i in 0..self.board_size {
-            let player_in_column = self.board[0][i].get_player();
-            let player_in_row = self.board[i][0].get_player();
+            let player_in_column = self.board[0][i].player;
+            let player_in_row = self.board[i][0].player;
 
             let mut condition_satisfied_for_column = true;
             let mut condition_satisfied_for_row = true;
 
             for j in 1..self.board_size {
-                if self.board[j][i].get_player().ne(player_in_column) {
+                if self.board[j][i].player != player_in_column {
                     condition_satisfied_for_column = false
                 }
 
-                if self.board[i][j].get_player().ne(player_in_row) {
+                if self.board[i][j].player != player_in_row {
                     condition_satisfied_for_row = false
                 }
             }
@@ -89,12 +86,12 @@ impl GameBoard {
 
     /// Set's `current_player` to player who has the next turn
     fn progress_player(&mut self) {
-        self.current_player = get_next_player(&self.current_player)
+        self.current_player.progress();
     }
 
     /// Set's `current_player` to player who had the previous turn
     fn regress_player(&mut self) {
-        self.current_player = get_previous_player(&self.current_player)
+        self.current_player.regress();
     }
 
     /// Return `Option<()>` and set the cell at `(column, row)` to `current_player` if it is a valid position and is currently unoccupied
@@ -105,7 +102,7 @@ impl GameBoard {
             && column < self.board_size
             && !self.board[row][column].is_occupied()
         {
-            self.board[row][column].set_player(&self.current_player);
+            self.board[row][column].player = self.current_player;
             self.progress_player();
             Some(())
         } else {
@@ -123,7 +120,7 @@ impl GameBoard {
         for row in 0..self.board_size {
             print!("{} |", row);
             for column in 0..self.board_size {
-                print!("{}|", self.board[row][column].get_display_string());
+                print!("{}|", self.board[row][column].player.to_str());
             }
             println!();
         }
@@ -162,12 +159,12 @@ pub mod tests {
 
         assert_eq!(game_board.mark_cell(0, 0), Some(()));
         assert_eq!(game_board.board[0][0].is_occupied(), true);
-        assert_eq!(*game_board.board[0][0].get_player(), Player::Cross);
+        assert_eq!(game_board.board[0][0].player, Player::Cross);
         assert_eq!(game_board.current_player, Player::Nought);
 
         assert_eq!(game_board.mark_cell(0, 0), None);
         assert_eq!(game_board.board[0][0].is_occupied(), true);
-        assert_eq!(*game_board.board[0][0].get_player(), Player::Cross);
+        assert_eq!(game_board.board[0][0].player, Player::Cross);
         assert_eq!(game_board.current_player, Player::Nought);
 
         assert_eq!(game_board.mark_cell(2, 0), None);
@@ -175,7 +172,7 @@ pub mod tests {
 
         assert_eq!(game_board.mark_cell(1, 1), Some(()));
         assert_eq!(game_board.board[1][1].is_occupied(), true);
-        assert_eq!(*game_board.board[1][1].get_player(), Player::Nought);
+        assert_eq!(game_board.board[1][1].player, Player::Nought);
         assert_eq!(game_board.current_player, Player::Cross);
     }
 

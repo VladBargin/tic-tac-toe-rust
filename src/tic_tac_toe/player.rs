@@ -1,54 +1,39 @@
-#[derive(Debug)]
-
 /// # Player
 ///
 /// An enum of all possible players that a cell can hold
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Player {
     None,
     Cross,
     Nought,
 }
 
-impl Clone for Player {
-    fn clone(&self) -> Player {
-        match self {
-            Player::None => Player::None,
-            Player::Cross => Player::Cross,
-            Player::Nought => Player::Nought,
+impl Player {
+    /// Updates itself to the player who has the next turn
+    pub fn progress(&mut self) {
+        *self = match *self {
+            Player::None => Player::Cross,
+            Player::Cross => Player::Nought,
+            Player::Nought => Player::Cross,
+        };
+    }
+
+    /// Updates itself to the player who had the turn before
+    pub fn regress(&mut self) {
+        *self = match *self {
+            Player::None => Player::Nought,
+            Player::Cross => Player::Nought,
+            Player::Nought => Player::Cross,
+        };
+    }
+
+    /// Returns the string representation of `player`
+    pub fn to_str(&self) -> &str {
+        match *self {
+            Player::None => " ",
+            Player::Cross => "x",
+            Player::Nought => "o",
         }
-    }
-}
-
-impl PartialEq for Player {
-    fn eq(&self, other: &Self) -> bool {
-        player_to_string(self) == player_to_string(other)
-    }
-}
-
-/// Get's the `Player` who has the turn after `player`
-pub fn get_next_player(player: &Player) -> Player {
-    match *player {
-        Player::None => Player::Cross,
-        Player::Cross => Player::Nought,
-        Player::Nought => Player::Cross,
-    }
-}
-
-/// Get's the `Player` who had the turn before `player`
-pub fn get_previous_player(player: &Player) -> Player {
-    match *player {
-        Player::None => Player::Nought,
-        Player::Cross => Player::Nought,
-        Player::Nought => Player::Cross,
-    }
-}
-
-/// Returns the string representation of `player`
-pub fn player_to_string(player: &Player) -> &str {
-    match *player {
-        Player::None => " ",
-        Player::Cross => "x",
-        Player::Nought => "o",
     }
 }
 
