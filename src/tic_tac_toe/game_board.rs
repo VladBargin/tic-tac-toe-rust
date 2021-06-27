@@ -1,3 +1,5 @@
+use std::io::{self, Write};
+
 use super::game_cell::GameCell;
 use super::player::Player;
 
@@ -110,29 +112,31 @@ impl GameBoard {
         }
     }
 
-    pub fn print_board(&self) {
-        print!("   ");
-        for column in 0..self.board_size {
-            print!("{} ", column);
-        }
-        println!();
+    pub fn print_board(&self, output: &mut impl Write) -> io::Result<()> {
+        write!(output, "{}", termion::clear::All,)?;
 
         for row in 0..self.board_size {
-            print!("{} |", row);
+            write!(output, "{}|", termion::cursor::Goto(1, row as u16 + 1))?;
             for column in 0..self.board_size {
-                print!("{}|", self.board[row][column].player.to_str());
+                write!(output, "{}|", self.board[row][column].player.to_str())?;
             }
-            println!();
         }
-    }
 
-    /// Print who's turn it is
-    pub fn print_current_player_message(&self) {
-        match self.current_player {
-            Player::Cross => println!("Turn of crosses!"),
-            Player::Nought => println!("Turn of noughts!"),
-            _ => print!(""),
-        }
+        // Print who's turn it is
+        write!(
+            output,
+            "{}{}",
+            termion::cursor::Goto(1, self.board_size as u16 + 1),
+            match self.current_player {
+                Player::Cross => "Turn of crosses!",
+                Player::Nought => "Turn of noughts!",
+                _ => "",
+            }
+        )?;
+
+        output.flush()?;
+
+        Ok(())
     }
 
     /// Print who won the game

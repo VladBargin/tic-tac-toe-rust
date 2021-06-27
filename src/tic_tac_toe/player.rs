@@ -28,8 +28,8 @@ impl Player {
     }
 
     /// Returns the string representation of `player`
-    pub fn to_str(&self) -> &str {
-        match *self {
+    pub fn to_str(self) -> &'static str {
+        match self {
             Player::None => " ",
             Player::Cross => "x",
             Player::Nought => "o",
